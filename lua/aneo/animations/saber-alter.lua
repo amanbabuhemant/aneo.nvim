@@ -1,6 +1,6 @@
 --[[
 
-Tital: Fate Zero Saber(Arturia Pendragon) Sprite
+Title: Fate Zero Saber(Arturia Pendragon) Sprite
 Orignal Artwork: https://www.deviantart.com/leanboox/art/Fate-Zero-Saber-Arturia-Pendragon-Sprite-738931099
 Artist: https://www.deviantart.com/leanboox
 Platform: DevianArt

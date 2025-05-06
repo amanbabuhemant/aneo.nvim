@@ -64,6 +64,7 @@ end
 ---@param color string
 ---@return boolean
 function Animation:ignore(color)
+    if not self.ignore_colors then return false end
     if color == nil then return true end
     for _, c in pairs(self.ignore_colors) do
         if c == color then

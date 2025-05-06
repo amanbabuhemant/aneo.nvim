@@ -14,7 +14,7 @@ Because... why not?
 
 ```lua
 {
-    "amanbabuhemnt/aneo.nvim",
+    "amanbabuhemant/aneo.nvim",
     config = function()
         require("aneo").setup()
     end
@@ -23,7 +23,7 @@ Because... why not?
 or
 ```lua
 {
-    "amanbabuhemnt/aneo.nvim",
+    "amanbabuhemant/aneo.nvim",
     opts = {
         -- your configuration options here
     }
@@ -33,7 +33,7 @@ or
 ### Packer.nvim
 ```lua
 use {
-    "amanbabuhemnt/aneo.nvim",
+    "amanbabuhemant/aneo.nvim",
     config = function()
         require("aneo").setup({
             -- your configuration options here
