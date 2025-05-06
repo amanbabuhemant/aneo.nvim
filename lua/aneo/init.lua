@@ -1,5 +1,7 @@
 --[[ aneo ]]--
 
+require("aneo.cmd")
+
 local M = {}
 
 M.opts = {

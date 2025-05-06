@@ -11,6 +11,11 @@ local Animation = {
     upper_half_block = "▀",
     lower_half_block = "▄",
     blank_block = "⠀",
+    ---@type Animation[]
+    animations = {},
+    opts = {
+        border = "none"
+    },
 }
 
 
@@ -23,12 +28,25 @@ function Animation:new(datatable)
     for f, v in pairs(datatable) do
         obj[f] = v
     end
+    table.insert(Animation.animations, obj)
     return obj
 end
 
+Animation.list = require("aneo.animations")
+
 ---@param name string
----@return Animation
+---@return Animation | nil
 function Animation.load(name)
+    local found = false
+    for _, a in pairs(Animation.list) do
+        if a == name then
+            found = true
+            break
+        end
+    end
+    if not found then
+        return nil
+    end
     local datatable = require("aneo.animations." .. name)
     return Animation:new(datatable)
 end
@@ -53,6 +71,12 @@ function Animation:ignore(color)
         end
     end
     return false
+end
+
+function Animation:set_opts(opts)
+    for n, v in pairs(opts) do
+        self.opts[n] = v
+    end
 end
 
 function Animation:setup_for_rendering()
@@ -150,7 +174,7 @@ function Animation:render(x, y)
         relative = "editor",
         row = y,
         col = x,
-        -- border = "single",
+        border = self.opts.border,
     })
 
     self.buf = buf
@@ -164,6 +188,10 @@ function Animation:render(x, y)
         print("animatetd rendring not implimented yet")
     end
 
+end
+
+function Animation:terminate_window()
+    vim.api.nvim_win_close(self.win, true)
 end
 
 return Animation
