@@ -1,7 +1,13 @@
 return {
     "mini-2b",
+    "mini-anya",
+    "mini-loid",
+    "mini-luffy",
     "mini-miku",
+    "mini-nami",
+    "mini-yor",
     "mona-lisa",
     "saber-alter",
     "sonada-umi",
+    "yor",
 }
