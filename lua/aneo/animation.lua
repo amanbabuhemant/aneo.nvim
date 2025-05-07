@@ -66,6 +66,7 @@ end
 function Animation:ignore(color)
     if not self.ignore_colors then return false end
     if color == nil then return true end
+    if color == "NONE" then return true end
     for _, c in pairs(self.ignore_colors) do
         if c == color then
             return true
@@ -123,10 +124,10 @@ function Animation:render_frame(frame)
     for r=1, self.height, 2 do
         local hl_groups = {}
         for c=1, self.width do
-            local fg_color = self.frames[frame][r][c]
+            local fg_color = self.frames[frame][r][c] or "NONE"
             local bg_color = "NONE"
             if r+1 <= self.height then
-                bg_color = self.frames[frame][r+1][c]
+                bg_color = self.frames[frame][r+1][c] or "NONE"
             end
 
             if self:ignore(fg_color) then fg_color = "NONE" end

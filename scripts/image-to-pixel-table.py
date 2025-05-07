@@ -17,7 +17,11 @@ def image_to_table(image_path) -> str:
     for y in range(image.height):
         row = "{ "
         for x in range(image.width):
-            c = "\"" + rgb_to_hex(image.getpixel((x, y))) + "\", "
+            pixel = image.getpixel((x, y))
+            if pixel[3]:
+                c = "\"" + rgb_to_hex(pixel) + "\", "
+            else:
+                c = "nil, "
             row += c
         row += "},\n"
         table += row
