@@ -5,12 +5,14 @@
 ---@field name string
 ---@field width number
 ---@field height number
----@field ignore_colors table[string]
+---@field ignore_colors table[string] | nil
 ---@field frames table[table]
+---@field frame_delays table[number] | nil
 local Animation = {
     upper_half_block = "▀",
     lower_half_block = "▄",
     blank_block = "⠀",
+    reset_cords = {},
     ---@type Animation[]
     animations = {},
     opts = {
@@ -87,13 +89,18 @@ function Animation:setup_for_rendering()
     vim.wo[win].relativenumber = false
     vim.wo[win].number = false
 
+    -- parent bg inherit
+    local parent_bg = vim.api.nvim_get_hl(0, { name = "Normal" }).bg
+    vim.api.nvim_set_hl(0, "aneo-trasparent", { bg = parent_bg })
+    vim.api.nvim_win_set_option(win, 'winhl', 'Normal:aneo-trasparent')
+
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
     local lines = {}
     local line = ""
     for _=1, self.width do
         line = line .. "▀"
     end
-    for _=1, self.height do
+    for _=1, math.floor(self.height/2)+self.height%2 do
         table.insert(lines, line)
     end
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -120,7 +127,13 @@ end
 
 ---@param frame number
 function Animation:render_frame(frame)
-    -- drowing
+    -- reseting buffer text
+    for _, cord in pairs(self.reset_cords) do
+        self:set_char(cord[1], cord[2], self.upper_half_block)
+    end
+    self.reset_cords = {}
+
+    -- drawing
     for r=1, self.height, 2 do
         local hl_groups = {}
         for c=1, self.width do
@@ -145,12 +158,14 @@ function Animation:render_frame(frame)
             -- transprancy
             if fg_color == "NONE" and bg_color == "NONE" then
                 self:set_char(math.floor(r/2), c-1, self.blank_block)
+                table.insert(self.reset_cords, { math.floor(r/2), c-1 })
             end
             if fg_color == "NONE" and bg_color ~= "NONE" then
                 self:set_char(math.floor(r/2), c-1, self.lower_half_block)
                 hl_name = hl_name .. fg_color
                 vim.api.nvim_set_hl(0, hl_name, { fg=bg_color, bg=fg_color })
                 fg_color, bg_color = bg_color, fg_color
+                table.insert(self.reset_cords, { math.floor(r/2), c-1 })
             end
 
             table.insert(hl_groups, hl_name)
@@ -166,9 +181,68 @@ function Animation:render_frame(frame)
     end
 end
 
---- Render animation on neovim
+function Animation:animate()
+    if not self.timer then
+        self.timer = vim.uv.new_timer()
+        self.current_frame = 1
+        self.current_delay = 1
+
+        if not self.frame_delays or #self.frame_delays == 0 then
+            self.frame_delays = { 1 }
+        end
+    end
+
+    if self._stop == true then
+        self.timer:stop()
+        self.timer:close()
+        self.timer = nil
+        return
+    end
+
+    local delay = self.frame_delays[self.current_delay] * 1000
+
+    self:render_frame(self.current_frame)
+
+    self.current_delay = self.current_delay + 1
+    if self.current_delay > #self.frame_delays then
+        self.current_delay = 1
+    end
+
+    self.current_frame = self.current_frame + 1
+    if self.current_frame > #self.frames then
+        self.current_frame = 1
+    end
+
+    self.timer:start(delay, 0, function() vim.schedule( function()
+        self:animate()
+    end)end)
+end
+
+-- Render animation on neovim
 function Animation:render(x, y)
 
+    self:create_window(x, y)
+
+    self:setup_for_rendering()
+
+    if self:is_static() then
+        self:render_frame(1)
+    else
+        self:animate()
+    end
+
+end
+
+function Animation:play()
+    self._stop = false
+    self:animate()
+end
+
+function Animation:stop()
+    self._stop = true
+end
+
+function Animation:create_window(x, y)
     local buf = vim.api.nvim_create_buf(false, true)
     local win = vim.api.nvim_open_win(buf, false, {
         width = self.width,
@@ -181,15 +255,6 @@ function Animation:render(x, y)
 
     self.buf = buf
     self.win = win
-
-    self:setup_for_rendering()
-
-    if self:is_static() then
-        self:render_frame(1)
-    else
-        print("animatetd rendring not implimented yet")
-    end
-
 end
 
 function Animation:terminate_window()

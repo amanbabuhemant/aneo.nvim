@@ -49,6 +49,7 @@ function M.close()
     if #Animation.animations > 0 then
         local a = Animation.animations[#Animation.animations]
         table.remove(Animation.animations, #Animation.animations)
+        a:stop()
         a:terminate_window()
     else
         print("no animations runnig to close")
