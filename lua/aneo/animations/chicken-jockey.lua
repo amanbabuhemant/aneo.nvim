@@ -1,3 +1,10 @@
+--[[
+
+Original Artwork: https://giphy.com/gifs/chicken-jockey-szaTML0LZFAQa3do7Y
+Artist: https://giphy.com/PixelArtFighter
+Platform: Giphy
+
+]]--
 return {
     width = 32,
     height = 32,

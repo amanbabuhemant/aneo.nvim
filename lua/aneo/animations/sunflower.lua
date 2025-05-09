@@ -1,3 +1,10 @@
+--[[
+
+Original Artwork: https://www.pixilart.com/art/sunflower-pvz-c387dc60436194a
+Artist Profile: https://www.pixilart.com/plafor
+Platform: PixilArt
+
+]]--
 return {
     title = "Snuflower",
     name = "sunflower",
