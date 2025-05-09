@@ -1,4 +1,5 @@
 return {
+    "chicken-jockey",
     "mini-2b",
     "mini-anya",
     "mini-loid",
@@ -9,5 +10,6 @@ return {
     "mona-lisa",
     "saber-alter",
     "sonada-umi",
+    "sunflower",
     "yor",
 }
