@@ -1,5 +1,6 @@
 return {
     "aneo",
+    "clock",
     "chicken-jockey",
     "illuminati",
     "mini-2b",
