@@ -21,6 +21,8 @@ function M.list()
     for _, a in pairs(Animation.list) do
         print(a)
     end
+    print("--------------------------")
+    print("Total arts/animations: ", #Animation.list)
 end
 
 function M.help()

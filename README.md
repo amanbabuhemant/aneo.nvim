@@ -1,6 +1,6 @@
 # aneo
 
-Cute pixel animations in neovim
+Cute pixel arts and animations in neovim
 
 
 ## Why?

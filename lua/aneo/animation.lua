@@ -15,6 +15,7 @@ local Animation = {
     reset_cords = {},
     ---@type Animation[]
     animations = {},
+    hl_cache = {},
     opts = {
         border = "none"
     },
@@ -55,12 +56,12 @@ end
 
 ---@return boolean
 function Animation:is_static()
-    return #self.frames == 1
+    return #self.frames == 1 and not self.frame_delays
 end
 
 ---@return boolean
 function Animation:is_animated()
-    return #self.frames ~= 1
+    return #self.frames ~= 1 or self.frame_delays
 end
 
 ---@param color string
@@ -110,6 +111,8 @@ function Animation:setup_for_rendering()
     vim.bo[buf].swapfile = false
     vim.bo[buf].buftype = "nofile"
     vim.bo[buf].bufhidden = "hide"
+    vim.bo[buf].undofile = false
+    vim.bo[buf].undolevels = 0
 
 end
 
@@ -133,14 +136,21 @@ function Animation:render_frame(frame)
     end
     self.reset_cords = {}
 
+    if type(self.frames[frame]) == "table" then
+        frame = self.frames[frame]
+    else
+        frame = self.frames[frame]()
+    end
+
     -- drawing
+    vim.api.nvim_buf_clear_namespace(self.buf, 0, 0, -1)
     for r=1, self.height, 2 do
         local hl_groups = {}
         for c=1, self.width do
-            local fg_color = self.frames[frame][r][c] or "NONE"
+            local fg_color = frame[r][c] or "NONE"
             local bg_color = "NONE"
             if r+1 <= self.height then
-                bg_color = self.frames[frame][r+1][c] or "NONE"
+                bg_color = frame[r+1][c] or "NONE"
             end
 
             if self:ignore(fg_color) then fg_color = "NONE" end
@@ -163,14 +173,16 @@ function Animation:render_frame(frame)
             if fg_color == "NONE" and bg_color ~= "NONE" then
                 self:set_char(math.floor(r/2), c-1, self.lower_half_block)
                 hl_name = hl_name .. fg_color
-                vim.api.nvim_set_hl(0, hl_name, { fg=bg_color, bg=fg_color })
                 fg_color, bg_color = bg_color, fg_color
                 table.insert(self.reset_cords, { math.floor(r/2), c-1 })
             end
 
             table.insert(hl_groups, hl_name)
 
-            vim.api.nvim_set_hl(0, hl_name, { fg=fg_color, bg=bg_color })
+            if not Animation.hl_cache[hl_name] then
+                vim.api.nvim_set_hl(0, hl_name, { fg=fg_color, bg=bg_color })
+                Animation.hl_cache[hl_name] = true
+            end
         end
 
         for i, hl_name in pairs(hl_groups) do
@@ -179,6 +191,12 @@ function Animation:render_frame(frame)
         end
 
     end
+
+    -- clearnig undotree
+    vim.api.nvim_buf_call(self.buf, function()
+        vim.cmd("silent! undojoin | silent! normal! u")
+    end)
+
 end
 
 function Animation:animate()
