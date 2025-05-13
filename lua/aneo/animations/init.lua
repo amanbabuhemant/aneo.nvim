@@ -1,9 +1,11 @@
 return {
-    "jumping-pichu",
     "aneo",
+    "autumn-leaf",
     "clock",
     "chicken-jockey",
+    "creeper-face",
     "illuminati",
+    "jumping-pichu",
     "mini-2b",
     "mini-anya",
     "mini-loid",
@@ -17,5 +19,6 @@ return {
     "saber-alter",
     "sonada-umi",
     "sunflower",
+    "tralalero-tralala",
     "yor",
 }
