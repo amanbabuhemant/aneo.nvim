@@ -89,6 +89,7 @@ function Animation:setup_for_rendering()
     local buf = self.buf
     vim.wo[win].relativenumber = false
     vim.wo[win].number = false
+    vim.wo[win].cursorline = false
 
     -- parent bg inherit
     local parent_bg = vim.api.nvim_get_hl(0, { name = "Normal" }).bg
@@ -113,7 +114,9 @@ function Animation:setup_for_rendering()
     vim.bo[buf].bufhidden = "hide"
     vim.bo[buf].undofile = false
     vim.bo[buf].undolevels = 0
-
+	vim.api.nvim_buf_call(buf, function()
+		vim.opt_local.wrap = false
+	end)
 end
 
 ---@param line number
