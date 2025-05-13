@@ -1,4 +1,5 @@
 return {
+    "jumping-pichu",
     "aneo",
     "clock",
     "chicken-jockey",
