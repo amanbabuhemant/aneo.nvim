@@ -2,12 +2,9 @@
 
 Cute pixel arts and animations in neovim
 
-<a href="https://asciinema.org/a/719169" target="_blank">
-    <video width="100%" autoplay loop muted playsinline>
-        <source src="https://github-production-user-asset-6210df.s3.amazonaws.com/134631394/443428780-8a94c632-b3b9-4fd4-bbbb-6ffff923dc5c.mp4" type="video/mp4">
-    </video>
-</a>
+[![Image](https://github.com/user-attachments/assets/4cfa40a2-3ae9-4ab2-b813-0a31c50db9da)](https://asciinema.org/a/719169)
 
+The above media might seem distorted in some places, because it's GIF conversion of original recording, watch the original recording [here](https://asciinema.org/a/719169)
 
 ## Why?
 
