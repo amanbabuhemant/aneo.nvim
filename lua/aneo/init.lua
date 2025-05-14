@@ -1,6 +1,6 @@
 --[[ aneo ]]--
 
-require("aneo.cmd")
+CMD = require("aneo.cmd")
 
 local M = {}
 
@@ -16,6 +16,18 @@ function M.setup(opts)
     opts = opts or {}
     for o, v in pairs(opts) do
         M.opts[o] = v
+    end
+
+    vim.schedule(M.startup)
+end
+
+function M.startup()
+    if M.opts.onstart then
+        if M.opts.auto_change_random then
+            CMD.random()
+        else
+            -- TODO: retrive and show last played animation
+        end
     end
 end
 

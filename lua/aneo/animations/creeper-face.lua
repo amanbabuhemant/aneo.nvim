@@ -4,7 +4,7 @@ Drawn by Aman Babu Hemant
 
 --]]
 return {
-    title = "Creeper Face"
+    title = "Creeper Face",
     name = "creeper-face",
     width = 8,
     height = 8,

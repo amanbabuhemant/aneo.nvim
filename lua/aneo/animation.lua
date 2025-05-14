@@ -61,7 +61,7 @@ end
 
 ---@return boolean
 function Animation:is_animated()
-    return #self.frames ~= 1 or self.frame_delays
+    return not not (#self.frames ~= 1 or self.frame_delays)
 end
 
 ---@param color string

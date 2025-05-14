@@ -4,13 +4,18 @@ Animation = require("aneo.animation")
 
 local M = {}
 
-function M.render(name, opts)
+function M.render(name, opts, animation)
     opts = opts or {}
-    local animation = Animation.load(name)
+
+    if not animation then
+        animation = Animation.load(name)
+    end
+
     if not animation then
         print("animation not found, try `:Aneo -l` for get list")
         return
     end
+
     animation:set_opts(opts)
     local x, y = vim.api.nvim_win_get_width(0), 1
     x = x - animation.width
@@ -34,6 +39,7 @@ function M.help()
     }
     local command_helps = {
         { "<animation-name>", "Render the animation" },
+        { "%", "Render animation by current file" },
         { "-l", "List all the animation names" },
         { "-h", "Show this message" },
         { "-c", "Close latest played animation" },
@@ -58,8 +64,27 @@ function M.close()
     end
 end
 
+function M.random()
+    math.randomseed(os.time())
+    local i = math.random(#Animation.list)
+    local a = Animation.list[i]
+    M.render(a)
+end
+
+function M.this()
+    local file_name = vim.api.nvim_buf_get_name(0)
+    print("file_name:", file_name)
+    local load = dofile(file_name)
+    print("load:", load)
+    local animation = Animation:new(load)
+    M.render(nil, nil, animation)
+end
+
 function M.cmd(opts)
     local args = opts.args
+    if args == "%" then
+        return M.this()
+    end
     if args:sub(1, 1) ~= "-" then
         M.render(args)
     elseif args == "-l" then
@@ -68,6 +93,8 @@ function M.cmd(opts)
         M.help()
     elseif args == "-c" then
         M.close()
+    elseif args == "-r" then
+        M.random()
     end
 end
 
@@ -83,5 +110,7 @@ vim.api.nvim_create_user_command("Aneo", M.cmd, {
 vim.api.nvim_create_user_command("AneoHelp", M.help,{})
 vim.api.nvim_create_user_command("AneoList", M.list,{})
 vim.api.nvim_create_user_command("AneoClose", M.close,{})
+vim.api.nvim_create_user_command("AneoRandom", M.random,{})
+vim.api.nvim_create_user_command("AneoThis", M.this, {})
 
 return M
