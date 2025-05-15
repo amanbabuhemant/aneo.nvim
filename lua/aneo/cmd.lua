@@ -60,7 +60,7 @@ function M.close()
         a:stop()
         a:terminate_window()
     else
-        print("no animations runnig to close")
+        print("no animations runing to close")
     end
 end
 
@@ -73,9 +73,7 @@ end
 
 function M.this()
     local file_name = vim.api.nvim_buf_get_name(0)
-    print("file_name:", file_name)
     local load = dofile(file_name)
-    print("load:", load)
     local animation = Animation:new(load)
     M.render(nil, nil, animation)
 end

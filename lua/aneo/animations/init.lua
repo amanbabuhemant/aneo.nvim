@@ -1,6 +1,8 @@
 return {
     "aneo",
     "autumn-leaf",
+    "b-ray",
+    "belt",
     "clock",
     "chicken-jockey",
     "creeper-face",
