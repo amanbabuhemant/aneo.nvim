@@ -141,6 +141,8 @@ local clock_face = function()
 end
 
 local clock = {
+    title = "Clock",
+    name = "clock",
     width = 21,
     height = 7,
     frame_delays = { 5 },

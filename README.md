@@ -51,10 +51,11 @@ Default settings:
 
 ```lua
 {
-    onstart = false,
-    auto_change = false,
-    auto_change_time = 10,
-    auto_change_random = true,
+    on_start = false,
+    auto = false,
+    auto_interval = 10,
+    cycle = false,
+    random = true,
     border = false,
 }
 ```

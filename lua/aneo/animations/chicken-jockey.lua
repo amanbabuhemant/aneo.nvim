@@ -6,6 +6,8 @@ Platform: Giphy
 
 ]]--
 return {
+    title = "Chicken Jockey",
+    name = "chicken-jockey",
     width = 32,
     height = 32,
     ignore_colors = { "00ff00" },

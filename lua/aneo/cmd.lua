@@ -4,6 +4,10 @@ Animation = require("aneo.animation")
 
 local M = {}
 
+M.paths = {
+    last_played = vim.fn.stdpath("data") .. "/last-played",
+}
+
 function M.render(name, opts, animation)
     opts = opts or {}
 
@@ -13,6 +17,7 @@ function M.render(name, opts, animation)
 
     if not animation then
         print("animation not found, try `:Aneo -l` for get list")
+        M.clear_last_played()
         return
     end
 
@@ -20,6 +25,7 @@ function M.render(name, opts, animation)
     local x, y = vim.api.nvim_win_get_width(0), 1
     x = x - animation.width
     animation:render(x, y)
+    M.save_last_played(animation.name)
 end
 
 function M.list()
@@ -62,6 +68,7 @@ function M.close()
     else
         print("no animations runing to close")
     end
+    M.clear_last_played()
 end
 
 function M.random()
@@ -76,6 +83,28 @@ function M.this()
     local load = dofile(file_name)
     local animation = Animation:new(load)
     M.render(nil, nil, animation)
+end
+
+---@param name string
+function M.save_last_played(name)
+    local file = io.open(M.paths.last_played, "w")
+    file:write(name)
+    file:close()
+end
+
+function M.clear_last_played()
+    local file = io.open(M.paths.last_played, "w")
+    file:write("")
+    file:close()
+end
+
+---@return string | nil
+function M.get_last_played()
+    local file = io.open(M.paths.last_played, "r")
+    if not file then
+        return nil
+    end
+    return file:read("*l")
 end
 
 function M.cmd(opts)

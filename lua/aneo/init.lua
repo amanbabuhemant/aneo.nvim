@@ -5,10 +5,11 @@ CMD = require("aneo.cmd")
 local M = {}
 
 M.opts = {
-    onstart = false,
-    auto_change = false,
-    auto_change_time = 10,
-    auto_change_random = true,
+    on_start = false,
+    auto = false,
+    auto_interval = 10,
+    cycle = false,
+    random = true,
     border = false,
 }
 
@@ -22,12 +23,25 @@ function M.setup(opts)
 end
 
 function M.startup()
-    if M.opts.onstart then
-        if M.opts.auto_change_random then
-            CMD.random()
-        else
-            -- TODO: retrive and show last played animation
+    -- on neovim startup
+
+    if M.opts.on_start then
+        if M.opts.auto then
+            -- TODO: make function auto start
+            -- return CMD.auto_start(M.opts)
         end
+        local last_played = CMD.get_last_played()
+        if last_played ~= nil and last_played ~= "" then
+            return CMD.render(last_played)
+        else
+            return CMD.random()
+        end
+    end
+
+    -- play if last played available
+    local last_played = CMD.get_last_played()
+    if last_played ~= nil and last_played ~= "" then
+        return CMD.render(last_played)
     end
 end
 

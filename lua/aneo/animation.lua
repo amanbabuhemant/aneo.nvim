@@ -90,6 +90,7 @@ function Animation:setup_for_rendering()
     vim.wo[win].relativenumber = false
     vim.wo[win].number = false
     vim.wo[win].cursorline = false
+    vim.wo[win].cursorcolumn = false
 
     -- parent bg inherit
     local parent_bg = vim.api.nvim_get_hl(0, { name = "Normal" }).bg
@@ -279,7 +280,7 @@ function Animation:create_window(x, y)
 end
 
 function Animation:terminate_window()
-    vim.api.nvim_win_close(self.win, true)
+    pcall(function()vim.api.nvim_win_close(self.win, true)end)
 end
 
 return Animation
