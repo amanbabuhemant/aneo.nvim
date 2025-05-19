@@ -26,6 +26,7 @@ function M.render(name, opts, animation)
     x = x - animation.width
     animation:render(x, y)
     M.save_last_played(animation.name)
+    return animation
 end
 
 function M.list()
@@ -107,6 +108,46 @@ function M.get_last_played()
     return file:read("*l")
 end
 
+function M.preview()
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, Animation.list)
+    vim.bo[buf].modifiable = false
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative="win",
+        width = 30,
+        height = math.min(vim.api.nvim_win_get_height(0)-2, #Animation.list),
+        row = 0,
+        col = 0,
+        border = "single",
+    })
+    vim.wo[win].cursorline = true
+
+    local function on_esc()
+        vim.api.nvim_buf_delete(buf, { force = true })
+        vim.api.nvim_feedkeys(
+            vim.api.nvim_replace_termcodes(
+                "<Esc>", true, false, true
+            ),
+            "n", false
+        )
+        M.close()
+    end
+
+    local function on_line_change()
+        local line = vim.api.nvim_get_current_line()
+        if #Animation.animations ~= 0 then
+            M.close()
+        end
+        local animation = Animation.load(line)
+        animation.opts.border = "single"
+        animation:render(31, -1)
+    end
+
+    vim.api.nvim_create_autocmd("CursorMoved", { buffer = buf, callback = on_line_change })
+    vim.keymap.set("n", "<Esc>", on_esc, { buffer=buf })
+    vim.keymap.set("n", "q", on_esc, { buffer=buf })
+end
+
 function M.cmd(opts)
     local args = opts.args
     if args == "%" then
@@ -139,5 +180,6 @@ vim.api.nvim_create_user_command("AneoList", M.list,{})
 vim.api.nvim_create_user_command("AneoClose", M.close,{})
 vim.api.nvim_create_user_command("AneoRandom", M.random,{})
 vim.api.nvim_create_user_command("AneoThis", M.this, {})
+vim.api.nvim_create_user_command("AneoPreview", M.preview, {})
 
 return M

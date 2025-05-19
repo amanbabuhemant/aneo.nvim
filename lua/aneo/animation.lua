@@ -269,7 +269,7 @@ function Animation:create_window(x, y)
     local win = vim.api.nvim_open_win(buf, false, {
         width = self.width,
         height = math.floor(self.height/2) + self.height % 2,
-        relative = "editor",
+        relative = "win",
         row = y,
         col = x,
         border = self.opts.border,
