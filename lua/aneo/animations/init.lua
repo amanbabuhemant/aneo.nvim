@@ -20,6 +20,7 @@ return {
     "mushrooms-in-a-jar",
     "saber-alter",
     "sonada-umi",
+    "speedometer",
     "sunflower",
     "tralalero-tralala",
     "yor",
