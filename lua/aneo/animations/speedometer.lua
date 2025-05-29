@@ -158,7 +158,7 @@ vim.on_key(count_key)
 return {
     title = "Speedometer",
     name = "speedometer",
-    width = 16,
+    width = 17,
     height = 8,
     frame_delays = { 1 },
     frames = { frame }

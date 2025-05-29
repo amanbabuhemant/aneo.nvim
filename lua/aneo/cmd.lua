@@ -1,12 +1,10 @@
 --[[ commands ]]--
 
 Animation = require("aneo.animation")
+Config = require("aneo.config")
+paths = require("aneo.paths")
 
 local M = {}
-
-M.paths = {
-    last_played = vim.fn.stdpath("data") .. "/last-played",
-}
 
 function M.render(name, opts, animation)
     opts = opts or {}
@@ -88,20 +86,20 @@ end
 
 ---@param name string
 function M.save_last_played(name)
-    local file = io.open(M.paths.last_played, "w")
+    local file = io.open(paths.last_played, "w")
     file:write(name)
     file:close()
 end
 
 function M.clear_last_played()
-    local file = io.open(M.paths.last_played, "w")
+    local file = io.open(paths.last_played, "w")
     file:write("")
     file:close()
 end
 
 ---@return string | nil
 function M.get_last_played()
-    local file = io.open(M.paths.last_played, "r")
+    local file = io.open(paths.last_played, "r")
     if not file then
         return nil
     end
@@ -148,6 +146,15 @@ function M.preview()
     vim.keymap.set("n", "q", on_esc, { buffer=buf })
 end
 
+function M.set(opts)
+    local args = opts.args
+    local sp = string.find(args, " ")
+    local name = string.sub(args, 1, sp-1)
+    local value = string.sub(args, sp+1)
+    Config.set(name, value)
+    Config.save()
+end
+
 function M.cmd(opts)
     local args = opts.args
     if args == "%" then
@@ -181,5 +188,6 @@ vim.api.nvim_create_user_command("AneoClose", M.close,{})
 vim.api.nvim_create_user_command("AneoRandom", M.random,{})
 vim.api.nvim_create_user_command("AneoThis", M.this, {})
 vim.api.nvim_create_user_command("AneoPreview", M.preview, {})
+vim.api.nvim_create_user_command("AneoSet", M.set, { nargs = "*", complete = Config.cmp })
 
 return M

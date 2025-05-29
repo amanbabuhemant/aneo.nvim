@@ -1,5 +1,9 @@
 --[[ Animation ]]--
 
+
+Config = require("aneo.config")
+
+
 ---@class Animation
 ---@field title string
 ---@field name string
@@ -17,10 +21,9 @@ local Animation = {
     animations = {},
     hl_cache = {},
     opts = {
-        border = "none"
+        border = "none", -- using config module now
     },
 }
-
 
 ---@param datatable table
 ---@return Animation
@@ -272,7 +275,7 @@ function Animation:create_window(x, y)
         relative = "win",
         row = y,
         col = x,
-        border = self.opts.border,
+        border = Config.opts.border.value
     })
 
     self.buf = buf

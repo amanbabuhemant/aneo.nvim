@@ -1,32 +1,25 @@
 --[[ aneo ]]--
 
 CMD = require("aneo.cmd")
+Config = require("aneo.config")
 
 local M = {}
-
-M.opts = {
-    on_start = false,
-    auto = false,
-    auto_interval = 10,
-    cycle = false,
-    random = true,
-    border = false,
-}
 
 function M.setup(opts)
     opts = opts or {}
     for o, v in pairs(opts) do
-        M.opts[o] = v
+        Config.set(o, v)
     end
 
+    -- Config.load()
     vim.schedule(M.startup)
 end
 
 function M.startup()
     -- on neovim startup
 
-    if M.opts.on_start then
-        if M.opts.auto then
+    if Config.opts.on_start.value then
+        if Config.opts.auto.value then
             -- TODO: make function auto start
             -- return CMD.auto_start(M.opts)
         end
