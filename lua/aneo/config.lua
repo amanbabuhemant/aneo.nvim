@@ -35,11 +35,11 @@ local C = {}
 C.config_file_path = paths.config
 
 C.opts = {
-    on_start        = Opt:new({ "on_start", "boolean", true }),
-    auto            = Opt:new({ "auto", "boolean", true }),
-    auto_interval   = Opt:new({ "auto_interval", "number", true }),
-    cycle           = Opt:new({ "cycle", "boolean", true }),
-    random          = Opt:new({ "random", "boolean", true }),
+    on_start        = Opt:new({ "on_start", "boolean", false }),
+    auto            = Opt:new({ "auto", "boolean", false }),
+    auto_interval   = Opt:new({ "auto_interval", "number", false }),
+    cycle           = Opt:new({ "cycle", "boolean", false }),
+    random          = Opt:new({ "random", "boolean", false }),
     border          = Opt:new({ "border", "string", "none" }),
 }
 

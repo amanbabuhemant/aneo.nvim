@@ -55,7 +55,7 @@ Default settings:
     auto = false,
     auto_interval = 10,
     cycle = false,
-    random = true,
-    border = false,
+    random = false,
+    border = "none",
 }
 ```
