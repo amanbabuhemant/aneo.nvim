@@ -10,14 +10,14 @@ def rgb_to_hex(rgb: tuple):
 
 def image_to_table(image_path) -> str:
 
-    image = Image.open(image_path)
-
+    image = Image.open(image_path).convert("RGBA")
+    pixels = image.load()
     table = "{\n"
 
     for y in range(image.height):
         row = "{ "
         for x in range(image.width):
-            pixel = image.getpixel((x, y))
+            pixel = pixels[x, y]
             if pixel[3]:
                 c = "\"" + rgb_to_hex(pixel) + "\", "
             else:
