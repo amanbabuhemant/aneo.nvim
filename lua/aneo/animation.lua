@@ -135,19 +135,62 @@ function Animation:set_char(line, col, char)
     vim.bo[buf].modifiable = false
 end
 
----@param frame number
-function Animation:render_frame(frame)
+---@param frame_number number
+---@return table
+function Animation:get_frame(frame_number)
+    --- Expend Frame, Rows, and Columns and return as table
+
+    -- Expendig frame
+    local frame = self.frames[frame_number]
+    if type(frame) == "function" then
+        frame = frame(frame_number)
+    end
+
+    -- Expending rows
+    for row_index, row in pairs(frame) do
+        if type(row) == "function" then
+            row = row(row_index, frame_number)
+        end
+
+        -- Expending columns
+        local expended_row = {}
+        local repeat_cell = 1
+        local next_col_index = 1
+        for i = 1, #row do
+            local col = row[i]
+            if type(col) == "number" then
+                repeat_cell = col
+                goto continue
+            end
+            while repeat_cell > 0 do
+                local color = col
+                if type(color) == "function" then
+                    color = color(next_col_index, row_index, frame_number)
+                end
+                if not color then color = false end
+                table.insert(expended_row, color)
+                next_col_index = next_col_index + 1
+                repeat_cell = repeat_cell - 1
+            end
+            repeat_cell = 1
+            ::continue::
+        end
+
+        frame[row_index] = expended_row
+    end
+
+    return frame
+end
+
+---@param frame_number number
+function Animation:render_frame(frame_number)
     -- reseting buffer text
     for _, cord in pairs(self.reset_cords) do
         self:set_char(cord[1], cord[2], self.upper_half_block)
     end
     self.reset_cords = {}
 
-    if type(self.frames[frame]) == "table" then
-        frame = self.frames[frame]
-    else
-        frame = self.frames[frame]()
-    end
+    local frame = self:get_frame(frame_number)
 
     -- drawing
     vim.api.nvim_buf_clear_namespace(self.buf, 0, 0, -1)
