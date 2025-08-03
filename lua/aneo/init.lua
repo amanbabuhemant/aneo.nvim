@@ -2,6 +2,8 @@
 
 CMD = require("aneo.cmd")
 Config = require("aneo.config")
+Manager = require("aneo.manager")
+paths = require("aneo.paths")
 
 local M = {}
 
@@ -11,7 +13,6 @@ function M.setup(opts)
         Config.set(o, v)
     end
 
-    -- Config.load()
     vim.schedule(M.startup)
 end
 

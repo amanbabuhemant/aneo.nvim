@@ -41,6 +41,7 @@ C.opts = {
     cycle           = Opt:new({ "cycle", "boolean", false }),
     random          = Opt:new({ "random", "boolean", false }),
     border          = Opt:new({ "border", "string", "none" }),
+    server          = Opt:new({ "server", "string", "aneo.artizote.com" }),
 }
 
 C.sep = "|"
@@ -106,5 +107,7 @@ function C.cmp(name, command, pos)
     print("pos:", pos)
 
 end
+
+C.load()
 
 return C

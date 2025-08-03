@@ -2,6 +2,7 @@
 
 
 Config = require("aneo.config")
+paths = require("aneo.paths")
 
 
 ---@class Animation
@@ -38,7 +39,7 @@ function Animation:new(datatable)
     return obj
 end
 
-Animation.list = require("aneo.animations")
+Animation.list = require("aneo.manager").list()
 
 ---@param name string
 ---@return Animation | nil
@@ -53,7 +54,7 @@ function Animation.load(name)
     if not found then
         return nil
     end
-    local datatable = require("aneo.animations." .. name)
+    local datatable = loadfile(paths.animations_dir .. "/" .. name .. ".lua")()
     return Animation:new(datatable)
 end
 

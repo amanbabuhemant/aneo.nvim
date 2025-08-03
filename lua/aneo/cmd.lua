@@ -2,6 +2,7 @@
 
 Animation = require("aneo.animation")
 Config = require("aneo.config")
+Manager = require("aneo.manager")
 paths = require("aneo.paths")
 
 local M = {}
@@ -146,6 +147,11 @@ function M.preview()
     vim.keymap.set("n", "q", on_esc, { buffer=buf })
 end
 
+function M.update()
+    local count = Manager.update(true)
+    print(count .. " Animations updated")
+end
+
 function M.set(opts)
     local args = opts.args
     local sp = string.find(args, " ")
@@ -174,6 +180,15 @@ function M.cmd(opts)
 end
 
 function M.cmd_complete(name, command, pos)
+    if table.maxn(Animation.list) == 0 and vim.fn.filereadable(paths.index) == 0 then
+        print("Updating Index")
+        Manager.update_index()
+        print("Syncing Animations")
+        Manager.sync()
+        Animation.list = Manager.list(true)
+    else
+        print("file found")
+    end
     return Animation.list
 end
 
@@ -189,5 +204,7 @@ vim.api.nvim_create_user_command("AneoRandom", M.random,{})
 vim.api.nvim_create_user_command("AneoThis", M.this, {})
 vim.api.nvim_create_user_command("AneoPreview", M.preview, {})
 vim.api.nvim_create_user_command("AneoSet", M.set, { nargs = "*", complete = Config.cmp })
+vim.api.nvim_create_user_command("AneoUpdate", M.update, {})
+vim.api.nvim_create_user_command("AneoSync", Manager.sync, {})
 
 return M
