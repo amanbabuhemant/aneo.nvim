@@ -6,15 +6,28 @@ Config = require("aneo.config")
 Manager = {}
 
 Manager.list_cache = nil
+Manager.hash_list_cache = nil
 Manager.server = Config.opts.server.value
 
+
+function Manager.animation_filepath(name)
+    return paths.animations_dir .. "/" .. name .. ".lua"
+end
+
+function Manager.animation_file(name, mode)
+    return io.open(Manager.animation_filepath(name), mode)
+end
+
+function Manager.animation_file_exists(name)
+    return vim.fn.filereadable(Manager.animation_filepath(name)) == 1
+end
 
 function Manager.download(name)
     local res = Curl.get(Manager.server .. "/api/animation/" .. name)
     if res.code ~= 200 then
         return false
     end
-    local animation_file = io.open(paths.animations_dir .. "/" .. name .. ".lua", "w")
+    local animation_file = Manager.animation_file(name, "w")
     if not animation_file then
         return false
     end
@@ -24,7 +37,7 @@ function Manager.download(name)
 end
 
 function Manager.remove(name)
-    local animation_filepath = paths.animations_dir .. "/" .. name .. ".lua"
+    local animation_filepath = Manager.animation_filepath(name)
     local success, _ = os.remove(animation_filepath)
     return success
 end
@@ -41,6 +54,7 @@ function Manager.update_index()
     index_file:write(res.body)
     index_file:close()
     Manager.list(true)
+    Manager.hash_list(true)
     return true
 end
 
@@ -61,30 +75,47 @@ function Manager.sync()
     })
     vim.wo[win].cursorline = true
 
-    vim.api.nvim_buf_set_lines(buf, 0, -1, true, {"Downloading Animations [" .. tostring(maxn) .. "]"})
+    vim.api.nvim_buf_set_lines(buf, 0, -1, true, {"Syncing Animations [" .. tostring(maxn) .. "]"})
     vim.api.nvim_buf_set_lines(buf, 1, -1, true, list)
     vim.cmd("redraw")
 
     for i, animation_name in ipairs(list) do
         vim.api.nvim_win_set_cursor(win, {i+1, 1})
-        vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[Down] " .. animation_name})
-        vim.cmd("redraw")
+        local will_download = true
 
-        local s = Manager.download(animation_name)
+        local af = Manager.animation_file(animation_name, "r")
+        if af then
+            local content =af:read("*a")
+            local hash = vim.fn.sha256(content)
+            af:close()
+            if hash == Manager.get_animaiton_hash(animation_name) then
+                -- File as already updated
+                will_download = false
+            end
+        end
+
+        local s = false
+
+        if will_download then
+            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[DOWN] " .. animation_name})
+            vim.cmd("redraw")
+            s = Manager.download(animation_name)
+        else
+            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[NOCH] " .. animation_name})
+            s = true
+        end
+
         if s then
             count = count + 1
-            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[Done] " .. animation_name})
+            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[DONE] " .. animation_name})
         else
-            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[Fail] " .. animation_name})
+            vim.api.nvim_buf_set_lines(buf, i, i+1, false, {"[FAIL] " .. animation_name})
         end
-        vim.api.nvim_buf_set_lines(buf, 0, 1, false, {"Downloading Animations [" .. tostring(count) .. "/" .. tostring(maxn) .. "]"})
-
+        vim.api.nvim_buf_set_lines(buf, 0, 1, false, {"Syncing Animations [" .. tostring(count) .. "/" .. tostring(maxn) .. "]"})
         vim.cmd("redraw")
     end
 
-    vim.wait(300, function()
-    pcall(vim.api.nvim_win_close, win, false)
-    end)
+    vim.wait(300, function() pcall(vim.api.nvim_win_close, win, false) end)
     return count
 end
 
@@ -99,10 +130,7 @@ function Manager.list(new)
     end
 
     if vim.fn.filereadable(paths.index) == 0 then
-        -- vim.schedule(Manager.update_index)
-        -- if vim.fn.filereadable(paths.index) == 0 then
         return {}
-        -- end
     end
 
     local list = {}
@@ -117,6 +145,37 @@ function Manager.list(new)
 
     Manager.list_cache = list
     return list
+end
+
+function Manager.hash_list(new)
+    if not new and Manager.hash_list_cache then
+        return Manager.hash_list_cache
+    end
+
+    if vim.fn.filereadable(paths.index) == 0 then
+        return {}
+    end
+
+    local list = {}
+    for line in io.lines(paths.index) do
+        if line == "\n" or line == "" then
+            goto continue
+        end
+        local animation_name = line:sub(1, line:find(":")-1)
+        local animation_hash = line:sub(line:find(":")+1, -1)
+        list[animation_name] = animation_hash
+        ::continue::
+    end
+
+    Manager.hash_list_cache = list
+    return list
+end
+
+function Manager.get_animaiton_hash(animation_name)
+    if not Manager.hash_list_cathe then
+        Manager.hash_list(true)
+    end
+    return Manager.hash_list_cache[animation_name]
 end
 
 return Manager

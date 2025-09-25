@@ -15,7 +15,11 @@ function M.render(name, opts, animation)
     end
 
     if not animation then
-        print("animation not found, try `:Aneo -l` for get list")
+        if #Animation.list > 0 then
+            print("animation not found, try `:Aneo -l` for get list")
+        else
+            print("No aneo animations found, run `:AneoUpdate` to download")
+        end
         M.clear_last_played()
         return
     end
@@ -33,7 +37,11 @@ function M.list()
         print(a)
     end
     print("--------------------------")
-    print("Total arts/animations: ", #Animation.list)
+    if #Animation.list > 0 then
+        print("Total arts/animations: ", #Animation.list)
+    else
+        print("No aneo animations found, run `:AneoUpdate` to download")
+    end
 end
 
 function M.help()
@@ -148,7 +156,7 @@ function M.preview()
 end
 
 function M.update()
-    local count = Manager.update(true)
+    local count = Manager.update()
     print(count .. " Animations updated")
 end
 

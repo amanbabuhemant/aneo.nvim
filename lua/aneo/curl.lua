@@ -30,6 +30,7 @@ function Curl.parse_response(response_text)
             end
         end
     end
+    body = body:sub(1, -3)
 
     return {
         code = code,
