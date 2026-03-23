@@ -3,10 +3,16 @@
 from PIL import Image
 
 def rgb_to_hex(rgb: tuple):
-    h = ""
-    for c in rgb[:3]:
-        h += hex(c)[2:].zfill(2)
-    return h
+    hex_string = ""
+
+    for idx, val in enumerate(rgb):
+        val = hex(val)[2:]
+        # if hex value < 16, pads 0 to left
+        if (int(val, 16) < 16):
+            val = "0" + val
+        hex_string += val
+
+    return hex_string
 
 def image_to_table(image_path) -> str:
 
